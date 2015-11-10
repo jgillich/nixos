@@ -31,6 +31,13 @@
     desktopManager.xterm.enable = false;
     desktopManager.default = "gnome3";
     startGnuPGAgent = true;
+    synaptics = {
+      enable = true;
+      accelFactor = "0.005";
+      minSpeed = "0.8";
+      maxSpeed = "5.0";
+      twoFingerScroll = true;
+    };
    };
 
   hardware.pulseaudio.enable = true;
