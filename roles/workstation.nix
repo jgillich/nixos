@@ -48,7 +48,7 @@
    };
 
   hardware.pulseaudio.enable = true;
-  
+
   containers.ghost =
     { config =
         { config, pkgs, ... }:

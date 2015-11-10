@@ -1,14 +1,14 @@
 with import <nixpkgs> {};
 
 stdenv.mkDerivation rec {
-  version = "1.1";
+  version = "1.2";
   name = "dotfiles-${version}";
 
   src = fetchFromGitHub {
     owner = "jgillich";
     repo = "dotfiles";
     rev = "v${version}";
-    sha256 = "0pz2hchp75bmnx5pmkci1i5yqrva66lspl2w644g7shny2r4nwnk";
+    sha256 = "1p8n5cja1y5w37qw6bzs0yv3wps7l15yl14d3sssi1bnbqna2gfl";
   };
 
   installPhase = ''

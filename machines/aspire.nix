@@ -7,7 +7,6 @@
       ../roles/workstation.nix
       ../roles/entertainment.nix
     ];
-
   networking.hostName = "aspire";
 
   system.stateVersion = "15.09";
