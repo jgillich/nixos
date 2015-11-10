@@ -3,14 +3,14 @@
 {
 
   environment.systemPackages = with pkgs; [
- 		firefoxWrapper
-		gnupg
-    (pass.override { x11Support = true; })
-    stow
+    ruby bundler
+    rustc cargo
     nodejs
+	  firefoxWrapper
+		gnupg
+    pass
+    stow
     atom
-    ruby
-    bundler
     gimp
     inkscape
     transmission
@@ -45,13 +45,18 @@
    };
 
   hardware.pulseaudio.enable = true;
-  fonts = {
-    enableFontDir = true;
-    enableGhostscriptFonts = true;
-    fonts = with pkgs; [
-      dejavu_fonts
-      meslo-lg
-      ubuntu_font_family
-    ];
-  };
+  
+  containers.ghost =
+    { config =
+        { config, pkgs, ... }:
+        {
+          environment.systemPackages = with pkgs; [
+            (import ../pkgs/dotfiles.nix)
+            nodejs
+            git
+            vim
+          ];
+        };
+    };
+
 }
