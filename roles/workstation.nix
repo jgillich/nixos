@@ -3,8 +3,8 @@
 {
 
   environment.systemPackages = with pkgs; [
-    firefoxWrapper
-    gnupg
+ 		firefoxWrapper
+		gnupg
     (pass.override { x11Support = true; })
     stow
     nodejs
@@ -17,6 +17,10 @@
     kde5.kdenlive
     docker
   ];
+
+  nixpkgs.config.packageOverrides = pkgs: with pkgs; {
+    firefoxWrapper = wrapFirefox { browser = firefox.override { enableOfficialBranding = true; }; };
+  };
 
   virtualisation.docker.enable = true;
 
