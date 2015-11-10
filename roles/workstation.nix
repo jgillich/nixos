@@ -20,7 +20,10 @@
 
   virtualisation.docker.enable = true;
 
-  services.syncthing.enable = true;
+  services.syncthing ={
+  	enable = true;
+  	user = "jakob";
+  };
 
   services.xserver = {
     enable = true;
