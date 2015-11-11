@@ -5,5 +5,7 @@
 { config, pkgs, ... }:
 
 {
-  imports =  [ ./machine.nix ];
+  imports =  [
+    ./machine.nix
+  ];
 }

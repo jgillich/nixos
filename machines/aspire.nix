@@ -1,12 +1,12 @@
 { config, lib, pkgs, ... }:
 
 {
-  imports =
-    [
-      ../roles/common.nix
-      ../roles/workstation.nix
-      ../roles/entertainment.nix
-    ];
+  imports = [
+    ../roles/common.nix
+    ../roles/workstation.nix
+    ../roles/entertainment.nix
+  ];
+
   networking.hostName = "aspire";
 
   system.stateVersion = "15.09";
@@ -21,19 +21,31 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  fileSystems."/" =
-    { device = "/dev/disk/by-uuid/0d549c2b-bf4a-4219-a01d-07c7092ad343";
-      fsType = "btrfs";
-    };
+  fileSystems."/" = {
+    device = "/dev/disk/by-uuid/0d549c2b-bf4a-4219-a01d-07c7092ad343";
+    fsType = "btrfs";
+  };
 
-  fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/B628-0CFD";
-      fsType = "vfat";
-    };
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-uuid/B628-0CFD";
+    fsType = "vfat";
+  };
 
   #swapDevices = [ { device = "/var/swapfile"; } ];
 
   nix.maxJobs = 4;
 
+  services.synaptics = {
+    enable = true;
+    accelFactor = "0.005";
+    minSpeed = "0.8";
+    maxSpeed = "5.0";
+    twoFingerScroll = true;
+    palmDetect = true;
+    additionalOptions =  ''
+      Option "RightButtonAreaRight" "3130"
+      Option "RightButtonAreaLeft" "2130"
+     '';
+   };
 
 }
