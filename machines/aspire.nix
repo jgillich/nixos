@@ -35,7 +35,7 @@
 
   nix.maxJobs = 4;
 
-  services.synaptics = {
+  services.xserver.synaptics = {
     enable = true;
     accelFactor = "0.005";
     minSpeed = "0.8";
@@ -43,8 +43,7 @@
     twoFingerScroll = true;
     palmDetect = true;
     additionalOptions =  ''
-      Option "RightButtonAreaRight" "3130"
-      Option "RightButtonAreaLeft" "2130"
+    	Option "SoftButtonAreas"  "50% 0 82% 0 0 0 0 0"  
      '';
    };
 
