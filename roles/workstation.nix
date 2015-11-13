@@ -2,10 +2,8 @@
 
 {
   environment.systemPackages = with pkgs; [
-    ruby bundler
     rustc cargo
     go
-    nodejs
     firefoxWrapper
     gnupg
     pass
@@ -17,21 +15,18 @@
     kde5.kdenlive
     docker
     heroku
+    gitg
   ];
 
   nixpkgs.config.packageOverrides = pkgs: with pkgs; {
     firefoxWrapper = wrapFirefox { browser = firefox.override { enableOfficialBranding = true; }; };
-
-    syncthing =  stdenv.lib.overrideDerivation syncthing (oldAttrs: {
-      version = "0.12.2";
-    });
   };
 
   virtualisation.docker.enable = true;
 
   services.syncthing = {
-  	enable = true;
-  	user = "jakob";
+    enable = true;
+    user = "jakob";
   };
 
   services.xserver = {

@@ -12,6 +12,10 @@
   environment.systemPackages = with pkgs; [
     (import ../pkgs/dotfiles.nix)
     git
+    python
+    ruby bundler
+    nodejs
+    gcc gnumake
     htop
     tmux
     vim
