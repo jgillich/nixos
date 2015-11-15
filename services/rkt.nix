@@ -7,6 +7,7 @@ let
 in
 
 {
+  
   options.virtualisation.rkt = {
     enable =
       mkOption {
@@ -19,15 +20,17 @@ in
       };
   };
 
+  config = {
     environment.systemPackages = [ pkgs.rkt ];
 
-  systemd.services.rkt = {
-    description = "rkt container engine metadata service";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network.target" ];
-    serviceConfig = {
-      ExecStart = "${pkgs.rkt}/bin/rkt metadata-service";
-    };
+    systemd.services.rkt = {
+      description = "rkt container engine metadata service";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "network.target" ];
+      serviceConfig = {
+        ExecStart = "${pkgs.rkt}/bin/rkt metadata-service";
+      };
 
+    };
   };
 }

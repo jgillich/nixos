@@ -1,6 +1,10 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ../services/rkt.nix
+  ];
+
   environment.systemPackages = with pkgs; [
     rustc cargo
     go
@@ -18,11 +22,16 @@
     gitg
   ];
 
+  environment.variables =
+    { GTK2_RC_FILES = "${pkgs.gnome_themes_standard}/share/themes/Adwaita/gtk-2.0/gtkrc";
+    };
+
   nixpkgs.config.packageOverrides = pkgs: with pkgs; {
     firefoxWrapper = wrapFirefox { browser = firefox.override { enableOfficialBranding = true; }; };
   };
 
   virtualisation.docker.enable = true;
+  virtualisation.rkt.enable = true;
 
   services.syncthing = {
     enable = true;
@@ -32,11 +41,9 @@
   services.xserver = {
     enable = true;
     layout = "us";
-    displayManager.gdm.enable = false;
     displayManager.slim.enable = true;
     desktopManager.gnome3.enable = true;
     desktopManager.xterm.enable = false;
-    desktopManager.default = "gnome3";
     startGnuPGAgent = true;
   };
 
