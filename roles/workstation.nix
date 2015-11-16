@@ -19,7 +19,7 @@
     kde5.kdenlive
     docker
     heroku
-    gitg
+    gitg gitAndTools.hub
   ];
 
   environment.variables =
@@ -41,13 +41,28 @@
   services.xserver = {
     enable = true;
     layout = "us";
-    displayManager.slim.enable = true;
+    displayManager.lightdm.enable = true;
     desktopManager.gnome3.enable = true;
     desktopManager.xterm.enable = false;
     startGnuPGAgent = true;
   };
 
   hardware.pulseaudio.enable = true;
+
+  security.polkit.enable = true;
+  security.polkit.extraConfig =
+    ''
+      polkit.addRule(function(action, subject) {
+        // allow everyone to change brightness
+        if (subject.isInGroup('wheel') &&
+            action.id == 'org.gnome.settings-daemon.plugins.power.backlight-helper' ||
+            action.id == 'org.freedesktop.login1.reboot'
+            ) {
+          return polkit.Result.YES;
+        }
+      });
+    '';
+
 
   containers.ghost = {
     config = { config, pkgs, ... }: {
