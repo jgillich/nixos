@@ -22,6 +22,7 @@
     curl
     unzip
     fish
+		usbutils
   ];
 
  environment.variables = {

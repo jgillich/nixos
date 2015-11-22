@@ -7,12 +7,11 @@
     ../roles/entertainment.nix
   ];
 
-  networking.hostName = "aspire";
+  networking.hostName = "thinkpad";
 
   system.stateVersion = "15.09";
 
   hardware.enableAllFirmware = true;
-  hardware.bumblebee.enable = true;
 
   boot.loader.gummiboot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

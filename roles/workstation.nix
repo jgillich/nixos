@@ -20,6 +20,7 @@
     docker
     heroku
     gitg gitAndTools.hub
+		parted gnome3.gnome-disk-utility
   ];
 
   environment.variables =
@@ -41,11 +42,50 @@
   services.xserver = {
     enable = true;
     layout = "us";
-    displayManager.lightdm.enable = true;
+    displayManager.slim.enable = true;
     desktopManager.gnome3.enable = true;
     desktopManager.xterm.enable = false;
     startGnuPGAgent = true;
   };
+
+	services.polipo = {
+		enable = true;
+		proxyAddress = "127.0.0.1";
+		proxyPort = 8123;
+	};
+
+	services.nginx = {
+		enable = true;
+    httpConfig =
+      ''
+      server {
+          listen 8080;
+          # vault cors proxy
+          # based on http://enable-cors.org/server_nginx.html
+          location / {
+            if ($request_method = 'OPTIONS') {
+              add_header 'Access-Control-Allow-Origin' '*';
+              add_header 'Access-Control-Allow-Credentials' 'true';
+              add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+              add_header 'Access-Control-Allow-Headers' 'x-vault-token,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Typ';
+              add_header 'Content-Type' 'text/plain charset=UTF-8';
+              add_header 'Content-Length' 0;
+              return 204;
+            }
+
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Credentials' 'true' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+            add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Typ' always;
+
+            proxy_redirect off;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://127.0.0.1:8200;
+          }
+        }
+      '';
+	};
 
   hardware.pulseaudio.enable = true;
 
@@ -53,7 +93,6 @@
   security.polkit.extraConfig =
     ''
       polkit.addRule(function(action, subject) {
-        // allow everyone to change brightness
         if (subject.isInGroup('wheel') &&
             action.id == 'org.gnome.settings-daemon.plugins.power.backlight-helper' ||
             action.id == 'org.freedesktop.login1.reboot'
