@@ -42,7 +42,7 @@
     twoFingerScroll = true;
     palmDetect = true;
     additionalOptions =  ''
-    	Option "SoftButtonAreas"  "50% 0 82% 0 0 0 0 0"  
+      Option "SoftButtonAreas"  "50% 0 82% 0 0 0 0 0"
      '';
    };
 

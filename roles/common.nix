@@ -22,7 +22,8 @@
     curl
     unzip
     fish
-		usbutils
+    usbutils
+    dhcp
   ];
 
  environment.variables = {

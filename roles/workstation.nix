@@ -20,7 +20,8 @@
     docker
     heroku
     gitg gitAndTools.hub
-		parted gnome3.gnome-disk-utility
+    parted gnome3.gnome-disk-utility
+    sshfsFuse
   ];
 
   environment.variables =
@@ -48,14 +49,14 @@
     startGnuPGAgent = true;
   };
 
-	services.polipo = {
-		enable = true;
-		proxyAddress = "127.0.0.1";
-		proxyPort = 8123;
-	};
+  services.polipo = {
+    enable = true;
+    proxyAddress = "127.0.0.1";
+    proxyPort = 8123;
+  };
 
-	services.nginx = {
-		enable = true;
+  services.nginx = {
+    enable = true;
     httpConfig =
       ''
       server {
@@ -85,22 +86,24 @@
           }
         }
       '';
-	};
+  };
 
   hardware.pulseaudio.enable = true;
 
-  security.polkit.enable = true;
-  security.polkit.extraConfig =
-    ''
-      polkit.addRule(function(action, subject) {
-        if (subject.isInGroup('wheel') &&
-            action.id == 'org.gnome.settings-daemon.plugins.power.backlight-helper' ||
-            action.id == 'org.freedesktop.login1.reboot'
-            ) {
-          return polkit.Result.YES;
-        }
-      });
-    '';
+  security.polkit = {
+    enable = true;
+    extraConfig =
+      ''
+        polkit.addRule(function(action, subject) {
+          if (subject.isInGroup('wheel') &&
+              action.id == 'org.gnome.settings-daemon.plugins.power.backlight-helper' ||
+              action.id == 'org.freedesktop.login1.reboot'
+              ) {
+            return polkit.Result.YES;
+          }
+        });
+      '';
+    };
 
 
   containers.ghost = {
