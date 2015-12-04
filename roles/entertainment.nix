@@ -4,7 +4,7 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
-    steam
+    #steam
     gstreamer
     gst_plugins_good
     gst_plugins_bad

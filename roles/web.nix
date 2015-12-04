@@ -1,1 +1,26 @@
-# https://github.com/NixOS/nixpkgs/blob/788800e437c4a0a25d95e217540bded68804b25e/nixos/modules/services/monitoring/munin.nix
+{ config, pkgs, ... }:
+
+{
+  services = {
+
+    nginx = {
+      enable = true;
+      httpConfig = ''
+        server {
+          listen 80;
+          root /var/www;
+        }
+      '';
+    };
+
+   munin-node.enable = true;
+   munin-cron = {
+     enable = true;
+     hosts = ''
+      [home]
+       address localhost
+     '';
+   };
+ };
+
+}

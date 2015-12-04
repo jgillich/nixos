@@ -22,7 +22,8 @@
     gitg gitAndTools.hub
     parted gnome3.gnome-disk-utility
     sshfsFuse
-  ];
+    irssi gnome3.polari xchat
+ ];
 
   environment.variables =
     { GTK2_RC_FILES = "${pkgs.gnome_themes_standard}/share/themes/Adwaita/gtk-2.0/gtkrc";
@@ -34,6 +35,8 @@
 
   virtualisation.docker.enable = true;
   virtualisation.rkt.enable = true;
+
+  networking.networkmanager.enable = true;
 
   services.syncthing = {
     enable = true;
