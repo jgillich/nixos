@@ -38,23 +38,23 @@ in
 
     nat = {
       enable = true;
-      internalIPs = [ "192.168.1.0/24" ]; #[ "192.168.1.0/24" "192.168.2.0/24" "192.168.3.0/24" ];
+      internalIPs = [ "10.0.1.0/24" "10.0.2.0/24" "10.0.3.0/24" ];
       externalInterface = "ppp0";
     };
 
     interfaces = {
-      #enp4s6f = {
-      #  ipAddress = "192.168.1.1";
-      #  prefixLength = 24;
-      #};
+      wlp4s0 = {
+        ipAddress = "10.0.1.1";
+        prefixLength = 24;
+      };
 
-      #enp4s6f1 = {
-      #  ipAddress = "192.168.2.1";
-      #  prefixLength = 24;
-      #};
+      enp2s0 = {
+        ipAddress = "10.0.2.1";
+        prefixLength = 24;
+      };
 
-      wlp2s0 = {
-        ipAddress = "192.168.1.1";
+      enp3s0 = {
+        ipAddress = "10.0.3.1";
         prefixLength = 24;
       };
     };
@@ -64,7 +64,7 @@ in
   networking.wireless.enable = false;
   services.hostapd = {
     enable = true;
-    interface = "wlp2s0";
+    interface = "wlp4s0";
     ssid = secrets.hostapd.ssid;
     hwMode = "g";
     channel = 10;
@@ -73,32 +73,31 @@ in
 
   services.dhcpd = {
     enable = true;
-    interfaces = [ "wlp2s0" ]; # "enp4s6f0" "enp4s6f1" ];
+    interfaces = [ "wlp4s0" "enp2s0" "enp3s0" ];
     extraConfig = ''
       authoritative;
       option subnet-mask            255.255.255.0;
       option domain-name-servers    8.8.8.8, 8.8.4.4;
 
-      subnet 192.168.1.0 netmask 255.255.255.0 {
-        range                       192.168.1.10 192.168.1.254;
-        option broadcast-address    192.168.1.255;
-        option routers              192.168.1.1;
+      subnet 10.0.1.0 netmask 255.255.255.0 {
+        range                       10.0.1.10 10.0.1.254;
+        option broadcast-address    10.0.1.255;
+        option routers              10.0.1.1;
       }
-     '';
 
-      #subnet 192.168.2.0 netmask 255.255.255.0 {
-      #  range                       192.168.2.10 192.168.2.254;
-       # option broadcast-address    192.168.2.255;
-      #  option routers              192.168.2.1;
-      #}
+      subnet 10.0.2.0 netmask 255.255.255.0 {
+        range                       10.0.2.10 10.0.2.254;
+        option broadcast-address    10.0.2.255;
+        option routers              10.0.2.1;
+      }
 
-      #subnet 192.168.3.0 netmask 255.255.255.0 {
-      #  range                       192.168.3.10 192.168.3.254;
-      #  option subnet-mask          255.255.255.0;
-      #  option broadcast-address    192.168.3.255;
-      #  option routers              192.168.3.1;
-      #}
-    #'';
+      subnet 10.0.3.0 netmask 255.255.255.0 {
+        range                       10.0.3.10 10.0.3.254;
+        option subnet-mask          255.255.255.0;
+        option broadcast-address    10.0.3.255;
+        option routers              10.0.3.1;
+      }
+    '';
   };
 
   services.dnsmasq = {

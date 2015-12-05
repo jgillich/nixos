@@ -17,13 +17,20 @@ in
       '';
     };
 
-   munin-node.enable = true;
    munin-cron = {
      enable = true;
      hosts = ''
-      [home]
+      [${config.networking.hostName}]
        address localhost
      '';
+   };
+   munin-node.enable = true;
+ };
+
+ containers.syncthing = {
+   autoStart = true;
+   config = { config, pkgs, ... }: {
+     services.syncthing.enable = true;
    };
  };
 

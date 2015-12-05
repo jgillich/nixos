@@ -31,6 +31,8 @@
    EDITOR = "vim";
  };
 
+ hardware.enableAllFirmware = true;
+
  boot.cleanTmpDir = true;
 
  security = {
