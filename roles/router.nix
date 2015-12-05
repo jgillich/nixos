@@ -11,6 +11,8 @@ in
 
   networking = {
     nameservers = [ "8.8.8.8" "4.4.4.4" ];
+    defaultGateway = "ppp0";
+    domain = "home";
 
     firewall = {
 
@@ -117,8 +119,7 @@ in
             defaultroute
             persist
             maxfail 0
-            ipcp-accept-remote
-            ipcp-accept-local
+            holdoff 3
             lcp-echo-interval 15
             lcp-echo-failure 3
           '';

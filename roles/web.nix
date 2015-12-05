@@ -3,6 +3,9 @@ let
   secrets = import ../secrets.nix;
 in
 {
+  virtualisation.docker.enable = true;
+  virtualisation.libvirtd.enable = true;
+
   services = {
     nginx = {
       enable = true;
@@ -24,18 +27,18 @@ in
    };
  };
 
+ # currently broken
+ #containers.gitlab = {
 
- containers.gitlab = {
+   #autoStart = true;
 
-   autoStart = true;
+   #config = { config, pkgs, ... }: {
+     #services.gitlab = {
+       #enable = true;
+       #databasePassword = secrets.gitlab.databasePassword;
+     #};
+   #};
 
-   config = { config, pkgs, ... }: {
-     services.gitlab = {
-       enable = true;
-       databasePassword = secrets.gitlab.databasePassword;
-     };
-   };
-
- };
+ #};
 
 }
