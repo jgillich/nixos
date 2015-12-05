@@ -22,7 +22,7 @@
     curl
     unzip
     fish
-    usbutils
+    usbutils pciutils
     dhcp
     bind
   ];
