@@ -98,10 +98,7 @@
     extraConfig =
       ''
         polkit.addRule(function(action, subject) {
-          if (subject.isInGroup('wheel') &&
-              action.id == 'org.gnome.settings-daemon.plugins.power.backlight-helper' ||
-              action.id == 'org.freedesktop.login1.reboot'
-              ) {
+          if (subject.isInGroup('wheel')) {
             return polkit.Result.YES;
           }
         });

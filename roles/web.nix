@@ -1,8 +1,9 @@
 { config, pkgs, ... }:
-
+let
+  secrets = import ../secrets.nix;
+in
 {
   services = {
-
     nginx = {
       enable = true;
       httpConfig = ''
@@ -21,6 +22,20 @@
        address localhost
      '';
    };
+ };
+
+
+ containers.gitlab = {
+
+   autoStart = true;
+
+   config = { config, pkgs, ... }: {
+     services.gitlab = {
+       enable = true;
+       databasePassword = secrets.gitlab.databasePassword;
+     };
+   };
+
  };
 
 }

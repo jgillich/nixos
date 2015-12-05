@@ -25,5 +25,6 @@
     };
 
   system.stateVersion = "15.09";
+  system.autoUpgrade.enable = true;
 
 }
