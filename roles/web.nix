@@ -16,12 +16,22 @@ in
       httpConfig = ''
         server {
           listen 80;
+          return 301 https://$server_name$request_uri;
+        }
+
+        server {
+          listen 443 ssl;
+          ssl_certificate /root/.lego/certificates/apu.sys.gillich.me.crt;
+          ssl_certificate_key /root/.lego/certificates/apu.sys.gillich.me.key;
           root /var/www;
         }
 
         server {
+          listen 443 ssl;
           server_name sync.app.gillich.me;
-          listen   80;
+          ssl_certificate /root/.lego/certificates/sync.app.gillich.me.crt;
+          ssl_certificate_key /root/.lego/certificates/sync.app.gillich.me.key;
+
           location / {
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -30,8 +40,11 @@ in
         }
 
         server {
+          listen 443 ssl;
           server_name torrent.app.gillich.me;
-          listen   80;
+          ssl_certificate /root/.lego/certificates/torrent.app.gillich.me.crt;
+          ssl_certificate_key /root/.lego/certificates/torrent.app.gillich.me.key;
+
           location / {
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -78,7 +91,7 @@ in
         CFURL="https://www.cloudflare.com/api.html?a=DIUP&hosts=$CFHOSTS&u=$CFUSER&tkn=$CFTOKEN&ip=$CFIP"
 
         # use curl to do the dynamic update
-        /usr/bin/curl -s $CFURL
+        curl -s $CFURL
         echo "updated ip"
       fi
     '';

@@ -10,8 +10,6 @@ in
   ];
 
   networking = {
-    nameservers = [ "8.8.8.8" "4.4.4.4" ];
-    defaultGateway = "ppp0";
     domain = "home";
 
     firewall = {
@@ -22,8 +20,7 @@ in
       allowedTCPPorts = [
         22
         80
-        9999
-        445
+        443
         139
       ];
 
@@ -46,6 +43,10 @@ in
       wlp4s0 = {
         ipAddress = "10.0.1.1";
         prefixLength = 24;
+      };
+
+      enp1s0 = {
+        useDHCP = false;
       };
 
       enp2s0 = {
@@ -103,6 +104,9 @@ in
   services.dnsmasq = {
     enable = true;
     servers = [ "8.8.8.8" "8.8.4.4" ];
+    extraConfig = ''
+      no-resolv
+    '';
   };
 
   services.ppp = {
@@ -113,12 +117,13 @@ in
         { interface = "enp1s0";
           username = secrets.easybell.username;
           password = secrets.easybell.password;
+          debug = true;
           extraOptions = ''
             noauth
             defaultroute
             persist
             maxfail 0
-            holdoff 3
+            holdoff 5
             lcp-echo-interval 15
             lcp-echo-failure 3
           '';

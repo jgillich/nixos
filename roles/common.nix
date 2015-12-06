@@ -19,12 +19,13 @@
     htop
     tmux
     vim
-    curl
+    curl wget
     unzip
     fish
     usbutils pciutils
     dhcp
     bind
+    psmisc
   ];
 
  environment.variables = {

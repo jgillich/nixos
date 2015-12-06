@@ -100,7 +100,7 @@ in
     # From Arch Linux ppp@.service
     systemd.services."ppp@" = {
       description = "PPP link to '%i'";
-      before       = [ "network.target" ];
+      before = [ "network.target" ];
 
       serviceConfig = {
         ExecStart = "${pkgs.ppp}/sbin/pppd call %I nodetach nolog";
