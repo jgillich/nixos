@@ -24,6 +24,7 @@
     sshfsFuse
     irssi gnome3.polari xchat
     virtmanager #gnome3.gnome-boxes
+    python27Packages.docker_compose
  ];
 
   environment.variables = {

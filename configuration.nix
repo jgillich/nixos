@@ -6,6 +6,6 @@
 
 {
   imports =  [
-    ./machine.nix
+    ./machines/apu.nix
   ];
 }
