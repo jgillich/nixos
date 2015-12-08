@@ -22,7 +22,8 @@ in
       httpConfig = ''
         server {
           listen 80;
-          return 301 https://$server_name$request_uri;
+          server_name _;
+          return 301 https://$host$request_uri;
         }
 
         server {
@@ -34,9 +35,9 @@ in
 
         server {
           listen 443 ssl;
-          server_name sync.app.gillich.me;
-          ssl_certificate /root/.lego/certificates/sync.app.gillich.me.crt;
-          ssl_certificate_key /root/.lego/certificates/sync.app.gillich.me.key;
+          server_name sync.xapp.ga;
+          ssl_certificate /root/.lego/certificates/xapp.ga.crt;
+          ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
 
           location / {
             proxy_set_header Host $host;
@@ -47,9 +48,9 @@ in
 
         server {
           listen 443 ssl;
-          server_name torrent.app.gillich.me;
-          ssl_certificate /root/.lego/certificates/torrent.app.gillich.me.crt;
-          ssl_certificate_key /root/.lego/certificates/torrent.app.gillich.me.key;
+          server_name torrent.xapp.ga;
+          ssl_certificate /root/.lego/certificates/xapp.ga.crt;
+          ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
 
           location / {
             proxy_set_header Host $host;
@@ -61,14 +62,40 @@ in
 
         server {
           listen 443 ssl;
-          server_name git.app.gillich.me;
-          ssl_certificate /root/.lego/certificates/git.app.gillich.me.crt;
-          ssl_certificate_key /root/.lego/certificates/git.app.gillich.me.key;
+          server_name git.xapp.ga;
+          ssl_certificate /root/.lego/certificates/xapp.ga.crt;
+          ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
 
           location / {
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_pass http://127.0.0.1:10080;
+          }
+        }
+
+        server {
+          listen 443 ssl;
+          server_name irc.xapp.ga;
+          ssl_certificate /root/.lego/certificates/xapp.ga.crt;
+          ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
+
+          location / {
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://127.0.0.1:8010;
+          }
+        }
+
+        server {
+          listen 443 ssl;
+          server_name music.xapp.ga;
+          ssl_certificate /root/.lego/certificates/xapp.ga.crt;
+          ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
+
+          location / {
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://127.0.0.1:8020;
           }
         }
       '';
@@ -83,7 +110,6 @@ in
     };
     munin-node.enable = true;
   };
-
 
   systemd.services.dyndns = {
     description = "Dynamic DNS";
@@ -109,46 +135,77 @@ in
       fi
     '';
 
-      # every 5 minutes
-      startAt = "*:0/5";
+    # every 5 minutes
+    startAt = "*:0/5";
+  };
+
+  systemd.services.backup = {
+    description = "Backup";
+    serviceConfig.Type = "oneshot";
+    path = [ pkgs.duplicity ];
+
+    script = ''
+      URL="webdavs://${secrets.box.username}:${secrets.box.password}@dav.box.com/dav/backups"
+      DUP="duplicity --ssl-cacert-file /etc/ssl/certs/ca-certificates.crt --encrypt-key Jakob\ Gillich"
+
+      $DUP /etc/nixos/roles $URL/nixos
+    '';
+
+    startAt = "05:40";
+  };
+
+  containers.shout = {
+    autoStart = true;
+    config = { config, pkgs, ... }: {
+      services.shout = {
+        enable = true;
+        port = 8010;
+        configFile = ''
+          module.exports = {
+
+          };
+        '';
+      };
     };
 
- containers.syncthing = {
-   autoStart = true;
-   config = { config, pkgs, ... }: {
-     services.syncthing = {
-       enable = true;
-       user = "jakob";
-     };
-     users.extraUsers.jakob = {
-       createHome = true;
-       home = "/home/jakob";
-     };
-   };
- };
 
- containers.deluge = {
-   autoStart = true;
-   config = { config, pkgs, ... }: {
-     services.deluge = {
-       enable = true;
-       web.enable = true;
-     };
-   };
- };
+  };
 
- # currently broken
- #containers.gitlab = {
+  # old
+  # containers.syncthing = {
+  #   autoStart = true;
+  #   config = { config, pkgs, ... }: {
+  #     services.syncthing = {
+  #       enable = true;
+  #       user = "jakob";
+  #     };
+  #     users.extraUsers.jakob = {
+  #       createHome = true;
+  #       home = "/home/jakob";
+  #     };
+  #   };
+  # };
 
-   #autoStart = true;
+  containers.deluge = {
+    autoStart = true;
+    config = { config, pkgs, ... }: {
+      services.deluge = {
+        enable = true;
+        web.enable = true;
+      };
+    };
+  };
 
-   #config = { config, pkgs, ... }: {
-     #services.gitlab = {
-       #enable = true;
-       #databasePassword = secrets.gitlab.databasePassword;
-     #};
-   #};
-
- #};
+  # broken
+  # containers.gitlab = {
+  #   autoStart = true;
+  #
+  #   config = { config, pkgs, ... }: {
+  #     services.gitlab = {
+  #       enable = true;
+  #       databasePassword = secrets.gitlab.databasePassword;
+  #     };
+  #   };
+  # };
 
 }

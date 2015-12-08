@@ -26,6 +26,8 @@
     dhcp
     bind
     psmisc
+    duplicity
+    stow
   ];
 
  environment.variables = {

@@ -7,6 +7,7 @@ in
 
   imports =  [
     ../services/ppp.nix
+    ../services/miniupnpd.nix
   ];
 
   networking = {
@@ -18,10 +19,12 @@ in
       allowPing = true;
 
       allowedTCPPorts = [
-        22
-        80
-        443
+        22    # ssh
+        80    # http
+        443   # https
         139
+        2222  # git
+        22000 # syncthing
       ];
 
       allowedUDPPorts = [
@@ -113,23 +116,28 @@ in
     enable = true;
 
     config = {
-      easybell =
-        { interface = "enp1s0";
-          username = secrets.easybell.username;
-          password = secrets.easybell.password;
-          debug = true;
-          extraOptions = ''
-            noauth
-            defaultroute
-            persist
-            maxfail 0
-            holdoff 5
-            lcp-echo-interval 15
-            lcp-echo-failure 3
-          '';
+      easybell = {
+        interface = "enp1s0";
+        username = secrets.easybell.username;
+        password = secrets.easybell.password;
+        debug = true;
+        extraOptions = ''
+          noauth
+          defaultroute
+          persist
+          maxfail 0
+          holdoff 5
+          lcp-echo-interval 15
+          lcp-echo-failure 3
+        '';
         };
-
     };
+  };
+
+  services.miniupnpd = {
+    enable = true;
+    externalInterface = "ppp0";
+    internalIPs = config.networking.nat.internalIPs;
   };
 
 }
