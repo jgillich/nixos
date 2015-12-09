@@ -19,41 +19,30 @@ in
 {
   options = {
     services.miniupnpd = {
-      enable = mkOption {
-        type        = types.bool;
-        default     = false;
-        description = "Enable the MiniUPnP daemon.";
-      };
+      enable = mkEnableOption "MiniUPnP daemon";
 
       externalInterface = mkOption {
         type = types.str;
         description = ''
-          Name of the external interface
+          Name of the external interface.
         '';
       };
 
       internalIPs = mkOption {
         type = types.listOf types.str;
         example = [ "192.168.1.0/24" ];
-        description =
-          ''
-            The IP address ranges to listen on.
-          '';
-      };
-
-      natpmp = mkOption {
-        default = false;
-        type = types.bool;
         description = ''
-          Whether to use to enable NAT-PMP support
+          The IP address ranges to listen on.
         '';
       };
+
+      natpmp = mkEnableOption "NAT-PMP support";
 
       upnp = mkOption {
         default = true;
         type = types.bool;
         description = ''
-          Whether to use to enable UPNP support
+          Whether to enable UPNP support.
         '';
       };
 
@@ -74,7 +63,7 @@ in
       wantedBy = [ "multi-user.target" ];
       path = [ pkgs.miniupnpd ];
       serviceConfig = {
-        ExecStart = "${pkgs.miniupnpd}/bin/miniupnpd -f ${configFile}";
+        ExecStart = "${pkgs.miniupnpd}/bin/miniupnpd -d -f ${configFile}";
       };
     };
   };

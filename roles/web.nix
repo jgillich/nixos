@@ -5,13 +5,7 @@ in
 {
   environment.systemPackages = with pkgs; [
     python27Packages.docker_compose
-    davfs2
   ];
-
-  #fileSystems."/mnt/box" = {
-  #  device = "https://dav.box.com/dav";
-  #  fsType = "davfs";
-  #};
 
   virtualisation.docker.enable = true;
   virtualisation.libvirtd.enable = true;
@@ -161,14 +155,10 @@ in
         enable = true;
         port = 8010;
         configFile = ''
-          module.exports = {
-
-          };
+          module.exports = {};
         '';
       };
     };
-
-
   };
 
   # old

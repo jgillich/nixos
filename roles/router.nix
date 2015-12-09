@@ -4,7 +4,6 @@ let
   secrets = import ../secrets.nix;
 in
 {
-
   imports =  [
     ../services/ppp.nix
     ../services/miniupnpd.nix
@@ -14,7 +13,6 @@ in
     domain = "home";
 
     firewall = {
-
       enable = true;
       allowPing = true;
 
@@ -22,18 +20,8 @@ in
         22    # ssh
         80    # http
         443   # https
-        139
         2222  # git
-        22000 # syncthing
       ];
-
-      allowedUDPPorts = [
-        137
-        138
-        67
-        68
-      ];
-
     };
 
     nat = {
@@ -62,10 +50,8 @@ in
         prefixLength = 24;
       };
     };
-
-
   };
-  networking.wireless.enable = false;
+
   services.hostapd = {
     enable = true;
     interface = "wlp4s0";
@@ -137,7 +123,6 @@ in
   services.miniupnpd = {
     enable = true;
     externalInterface = "ppp0";
-    internalIPs = config.networking.nat.internalIPs;
+    internalIPs = [ "10.0.1.1/24" "10.0.2.1/24" "10.0.3.1/24" ];
   };
-
 }

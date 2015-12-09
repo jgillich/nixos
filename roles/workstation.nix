@@ -13,8 +13,7 @@
     pass
     stow
     atom
-    gimp
-    inkscape
+    gimp inkscape
     transmission
     pitivi
     docker
@@ -38,6 +37,7 @@
   };
 
   virtualisation.docker.enable = true;
+  virtualisation.docker.socketActivation = false;
   virtualisation.rkt.enable = true;
   virtualisation.libvirtd.enable = true;
 
@@ -96,30 +96,15 @@
       '';
   };
 
-  hardware.pulseaudio.enable = true;
-
   security.polkit = {
     enable = true;
-    extraConfig =
-      ''
-        polkit.addRule(function(action, subject) {
-          if (subject.isInGroup('wheel')) {
-            return polkit.Result.YES;
-          }
-        });
-      '';
-    };
-
-
-  containers.ghost = {
-    config = { config, pkgs, ... }: {
-      environment.systemPackages = with pkgs; [
-        (import ../pkgs/dotfiles.nix)
-        nodejs
-        git
-        vim
-      ];
-    };
+    extraConfig = ''
+      polkit.addRule(function(action, subject) {
+        if (subject.isInGroup('wheel')) {
+          return polkit.Result.YES;
+        }
+      });
+    '';
   };
 
 }

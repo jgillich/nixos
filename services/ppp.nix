@@ -1,5 +1,7 @@
 { config, lib, pkgs, ... }:
 
+# FIXME: make an assertion of interface != ""
+
 with lib;
 
 let
@@ -8,11 +10,7 @@ in
 {
   options = {
     services.ppp = {
-      enable = mkOption {
-        type        = types.bool;
-        default     = false;
-        description = "Enable the ppp client service module.";
-      };
+      enable = mkEnableOption "PPP client";
 
       config = mkOption {
         type = types.attrsOf (types.submodule (
@@ -68,16 +66,11 @@ in
 
         example = literalExample ''
           {
-            velox =
-              { username = "0000000000@oi.com.br";
-                password = "fulano";
-                debug = false;
-              };
-            ctbc =
-              { username = "0000000000@ctbc.com.br";
-                password = "fulano";
-                debug = false;
-              };
+            velox = {
+              interface = "enp1s0";
+              username = "0000000000@oi.com.br";
+              password = "fulano";
+            };
           }
         '';
 
@@ -92,12 +85,6 @@ in
   };
 
   config = mkIf cfg.enable {
-
-    # FIXME: make an assertion of interface != ""
-
-    #environment.systemPackages = [ pkgs.ppp ];
-
-    # From Arch Linux ppp@.service
     systemd.services."ppp@" = {
       description = "PPP link to '%i'";
       before = [ "network.target" ];
@@ -113,19 +100,18 @@ in
       wantedBy = [ "multi-user.target" ];
     };
 
-    # Setup ppp config files
     environment.etc = {
-        "ppp/pap-secrets".text = concatStringsSep "\n"
-            (mapAttrsToList (name: cfg: "${cfg.username} * ${cfg.password}") cfg.config);
-        } //
-        mapAttrs' (name: cfg: nameValuePair "ppp/peers/${name}"
-        { text = concatStringsSep "\n"
-            [ "plugin rp-pppoe.so" # FIXME: generalize for non pppoe
-              "${cfg.interface}"
-              "user \"${cfg.username}\""
-              "${cfg.extraOptions}"
-              (optionalString cfg.debug "debug")
-            ];
-        }) cfg.config;
+      "ppp/pap-secrets".text = concatStringsSep "\n"
+        (mapAttrsToList (name: cfg: "${cfg.username} * ${cfg.password}") cfg.config);
+      } //
+      mapAttrs' (name: cfg: nameValuePair "ppp/peers/${name}"
+      { text = concatStringsSep "\n"
+        [ "plugin rp-pppoe.so" # FIXME: generalize for non pppoe
+          "${cfg.interface}"
+          "user \"${cfg.username}\""
+          "${cfg.extraOptions}"
+          (optionalString cfg.debug "debug")
+        ];
+      }) cfg.config;
   };
 }
