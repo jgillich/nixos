@@ -46,6 +46,7 @@
   services.syncthing = {
     enable = true;
     user = "jakob";
+    dataDir = "/home/jakob";
   };
 
   services.xserver = {
@@ -56,6 +57,8 @@
     desktopManager.xterm.enable = false;
     startGnuPGAgent = true;
   };
+
+  programs.ssh.startAgent = false;
 
   services.polipo = {
     enable = true;

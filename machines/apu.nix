@@ -24,12 +24,12 @@
   };
 
   fileSystems."/" = {
-    device = "/dev/disk/by-uuid/7c3cdc13-6d8f-4e69-92bb-264f92376984";
+    device = "/dev/disk/by-uuid/76cce545-e684-45e8-bc13-04dea5dc63dc";
     fsType = "btrfs";
     options = "defaults,compress=lzo,noatime";
   };
 
-  system.stateVersion = "15.09";
+  system.stateVersion = "16.03";
   system.autoUpgrade.enable = true;
 
   nix.gc.automatic = true;

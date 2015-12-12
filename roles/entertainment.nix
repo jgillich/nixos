@@ -7,26 +7,26 @@ in
 
   environment.systemPackages = with pkgs; [
     steam
-    mopidy mopidy-mopify
+    #mopidy mopidy-mopify
   ];
 
   hardware = {
     opengl.driSupport = true;
-    pulseaudio.enable = true;
     opengl.driSupport32Bit = true;
+    pulseaudio.enable = true;
     pulseaudio.support32Bit = true;
   };
 
-  services.mopidy = {
-    enable = true;
-    extensionPackages = [ pkgs.mopidy-moped pkgs.mopidy-gmusic ];
-    configuration = ''
-      [mpd]
-      hostname = ::
+  #services.mopidy = {
+  #  enable = true;
+  #  extensionPackages = [ pkgs.mopidy-moped pkgs.mopidy-gmusic ];
+  #  configuration = ''
+  #    [mpd]
+  #    hostname = ::
 
-      [gmusic]
-      username = ${secrets.gmusic.username}
-      password = ${secrets.gmusic.password}
-    '';
-  };
+  #    [gmusic]
+  #    username = ${secrets.gmusic.username}
+  #    password = ${secrets.gmusic.password}
+  #  '';
+  #};
 }
