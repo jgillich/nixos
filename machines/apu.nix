@@ -26,15 +26,13 @@
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/7c3cdc13-6d8f-4e69-92bb-264f92376984";
     fsType = "btrfs";
-  };
-
-  fileSystems."/sdcard" = {
-    device = "/dev/sdb1";
-    fsType = "btrfs";
+    options = "defaults,compress=lzo,noatime";
   };
 
   system.stateVersion = "15.09";
   system.autoUpgrade.enable = true;
+
+  nix.gc.automatic = true;
 
   services.haveged.enable = true;
 }

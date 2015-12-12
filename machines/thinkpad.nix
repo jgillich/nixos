@@ -9,8 +9,6 @@
 
   networking.hostName = "thinkpad";
 
-  system.stateVersion = "15.09";
-
   hardware.enableAllFirmware = true;
 
   boot.loader.gummiboot.enable = true;
@@ -23,6 +21,7 @@
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/0d549c2b-bf4a-4219-a01d-07c7092ad343";
     fsType = "btrfs";
+    options = "defaults,compress=lzo,noatime";
   };
 
   fileSystems."/boot" = {
@@ -30,9 +29,10 @@
     fsType = "vfat";
   };
 
-  #swapDevices = [ { device = "/var/swapfile"; } ];
+  system.stateVersion = "15.09";
+  system.autoUpgrade.enable = true;
 
-  nix.maxJobs = 4;
+  nix.gc.automatic = true;
 
   services.xserver.synaptics = {
     enable = true;

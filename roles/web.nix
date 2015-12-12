@@ -7,7 +7,8 @@ in
     python27Packages.docker_compose
   ];
 
-  virtualisation.docker.enable = true;
+  virtualisation.docker.enable = false;
+  virtualisation.docker.socketActivation = false;
   virtualisation.libvirtd.enable = true;
 
   services = {
@@ -63,7 +64,7 @@ in
           location / {
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_pass http://127.0.0.1:10080;
+            proxy_pass http://127.0.0.1:8080;
           }
         }
 
@@ -89,7 +90,20 @@ in
           location / {
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_pass http://127.0.0.1:8020;
+            proxy_pass http://127.0.0.1:4040;
+          }
+        }
+
+        server {
+          listen 443 ssl;
+          server_name mail.xapp.ga;
+          ssl_certificate /root/.lego/certificates/xapp.ga.crt;
+          ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
+
+          location / {
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://127.0.0.1:33411;
           }
         }
       '';
@@ -133,48 +147,85 @@ in
     startAt = "*:0/5";
   };
 
-  systemd.services.backup = {
-    description = "Backup";
-    serviceConfig.Type = "oneshot";
-    path = [ pkgs.duplicity ];
+  #systemd.services.backup = {
+  #  description = "Backup";
+  #  serviceConfig.Type = "oneshot";
+  #  path = [ pkgs.duplicity ];
 
-    script = ''
-      URL="webdavs://${secrets.box.username}:${secrets.box.password}@dav.box.com/dav/backups"
-      DUP="duplicity --ssl-cacert-file /etc/ssl/certs/ca-certificates.crt --encrypt-key Jakob\ Gillich"
+  #  script = ''
+  #    URL="webdavs://${secrets.box.username}:${secrets.box.password}@dav.box.com/dav/backups"
+  #    DUP="duplicity --ssl-cacert-file /etc/ssl/certs/ca-certificates.crt --encrypt-key Jakob\ Gillich"
 
-      $DUP /etc/nixos/roles $URL/nixos
-    '';
+  #    $DUP /etc/nixos/roles $URL/nixos
+  #  '';
 
-    startAt = "05:40";
-  };
+  #  startAt = "05:40";
+  #};
 
   containers.shout = {
     autoStart = true;
     config = { config, pkgs, ... }: {
+      environment.systemPackages = [ pkgs.shout ];
       services.shout = {
         enable = true;
         port = 8010;
+        private = true;
         configFile = ''
-          module.exports = {};
+          module.exports = {
+            public: false,
+            host: "0.0.0.0",
+            port: 9000,
+            bind: undefined,
+            theme: "themes/example.css",
+            autoload: true,
+            prefetch: false,
+            prefetchMaxImageSize: 512,
+            displayNetwork: true,
+            logs: {
+              format: "YYYY-MM-DD HH:mm:ss",
+              timezone: "UTC+00:00"
+            },
+            defaults: {
+              name: "Freenode",
+              host: "irc.freenode.org",
+              port: 6697,
+              password: "",
+              tls: true,
+              nick: "shout-user",
+              username: "shout-user",
+              realname: "Shout User",
+              join: "#foo, #shout-irc"
+            },
+            transports: ["polling", "websocket"],
+            https: {
+              enable: false,
+              key: "",
+              certificate: ""
+            },
+            identd: {
+              enable: false,
+              port: 113
+            }
+          };
         '';
       };
     };
   };
 
-  # old
-  # containers.syncthing = {
-  #   autoStart = true;
-  #   config = { config, pkgs, ... }: {
-  #     services.syncthing = {
-  #       enable = true;
-  #       user = "jakob";
-  #     };
-  #     users.extraUsers.jakob = {
-  #       createHome = true;
-  #       home = "/home/jakob";
-  #     };
-  #   };
-  # };
+  containers.syncthing = {
+    autoStart = true;
+    config = { config, pkgs, ... }: {
+      services.syncthing = {
+        enable = true;
+        user = "jakob";
+        dataDir = "/home/jakob";
+      };
+      users.extraUsers.jakob = {
+        createHome = true;
+        home = "/home/jakob";
+      };
+    };
+  };
 
   containers.deluge = {
     autoStart = true;
@@ -186,16 +237,41 @@ in
     };
   };
 
-  # broken
-  # containers.gitlab = {
-  #   autoStart = true;
-  #
-  #   config = { config, pkgs, ... }: {
-  #     services.gitlab = {
-  #       enable = true;
-  #       databasePassword = secrets.gitlab.databasePassword;
-  #     };
-  #   };
-  # };
+  containers.subsonic = {
+    autoStart = true;
+    config = { config, pkgs, ... }: {
+      environment.systemPackages = [ pkgs.nfs-utils ];
+      fileSystems."/var/music" = {
+        device = "10.0.3.11:/var/music";
+        fsType = "nfs";
+      };
+      services.subsonic = {
+        enable = true;
+        maxMemory = 1000;
+      };
+    };
+  };
 
+  containers.gitlab = {
+    autoStart = true;
+    config = { config, pkgs, ... }: {
+      services.gitlab = {
+        enable = true;
+        port = 8030;
+        emailFrom = "gitlab@xapp.ga";
+        host = "git.xapp.ga";
+        databasePassword = secrets.gitlab.databasePassword;
+      };
+    };
+  };
+
+  containers.mailpile = {
+    autoStart = true;
+    config = { config, pkgs, ... }: {
+      services.mailpile = {
+        enable = true;
+        hostname = "mail.xapp.ga";
+      };
+    };
+  };
 }

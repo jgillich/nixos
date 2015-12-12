@@ -11,16 +11,19 @@ in
 
   networking = {
     domain = "home";
+    nameservers = [ "8.8.8.8" "8.8.4.4" ];
 
     firewall = {
       enable = true;
       allowPing = true;
-
+      trustedInterfaces = [ "wlp4s0" ];
       allowedTCPPorts = [
         22    # ssh
         80    # http
         443   # https
         2222  # git
+      ];
+      allowedUDPPorts = [
       ];
     };
 
@@ -69,6 +72,10 @@ in
       option subnet-mask            255.255.255.0;
       option domain-name-servers    8.8.8.8, 8.8.4.4;
 
+      # lease time 24 hours
+      max-lease-time                86400;
+      default-lease-time            86400;
+
       subnet 10.0.1.0 netmask 255.255.255.0 {
         range                       10.0.1.10 10.0.1.254;
         option broadcast-address    10.0.1.255;
@@ -83,7 +90,6 @@ in
 
       subnet 10.0.3.0 netmask 255.255.255.0 {
         range                       10.0.3.10 10.0.3.254;
-        option subnet-mask          255.255.255.0;
         option broadcast-address    10.0.3.255;
         option routers              10.0.3.1;
       }
@@ -91,7 +97,7 @@ in
   };
 
   services.dnsmasq = {
-    enable = true;
+    enable = false;
     servers = [ "8.8.8.8" "8.8.4.4" ];
     extraConfig = ''
       no-resolv
