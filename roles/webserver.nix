@@ -3,12 +3,6 @@ let
   secrets = import ../secrets.nix;
 in
 {
-  environment.systemPackages = with pkgs; [
-    python27Packages.docker_compose
-  ];
-
-  virtualisation.docker.enable = false;
-  virtualisation.docker.socketActivation = false;
   virtualisation.libvirtd.enable = true;
 
   services = {
@@ -90,7 +84,7 @@ in
           location / {
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_pass http://127.0.0.1:4040;
+            proxy_pass https://127.0.0.1:8020;
           }
         }
 
@@ -117,6 +111,13 @@ in
       '';
     };
     munin-node.enable = true;
+
+    nfs.server = {
+      enable = true;
+      exports = ''
+        /var/music  10.0.1.1(rw,sync,no_subtree_check)
+      '';
+    };
   };
 
   systemd.services.dyndns = {
@@ -242,12 +243,12 @@ in
     config = { config, pkgs, ... }: {
       environment.systemPackages = [ pkgs.nfs-utils ];
       fileSystems."/var/music" = {
-        device = "10.0.3.11:/var/music";
+        device = "10.0.1.1:/var/music";
         fsType = "nfs";
       };
       services.subsonic = {
         enable = true;
-        maxMemory = 1000;
+        httpsPort = 8020;
       };
     };
   };
@@ -261,6 +262,10 @@ in
         emailFrom = "gitlab@xapp.ga";
         host = "git.xapp.ga";
         databasePassword = secrets.gitlab.databasePassword;
+      };
+      services.openssh = {
+        enable = true;
+        ports = [ 2222 ];
       };
     };
   };

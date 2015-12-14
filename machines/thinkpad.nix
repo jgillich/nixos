@@ -9,13 +9,11 @@
 
   networking.hostName = "thinkpad";
 
-  hardware.enableAllFirmware = true;
-
   boot = {
     loader.gummiboot.enable = true;
     loader.efi.canTouchEfiVariables = true;
     initrd.availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usbhid" "sd_mod" "rtsx_pci_sdmmc" ];
-    kernelModules = [ "kvm-intel" ];
+    kernelModules = [ "kvm-intel" "tun" "virtio" ];
   };
 
   fileSystems."/" = {
@@ -32,11 +30,5 @@
   system.stateVersion = "16.03";
   system.autoUpgrade.enable = true;
 
-  nix.gc.automatic = true;
   nix.maxJobs = 4;
-
-  services.xserver.synaptics = {
-    enable = true;
-  };
-
 }

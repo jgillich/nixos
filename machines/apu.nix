@@ -4,7 +4,7 @@
   imports = [
     ../roles/common.nix
     ../roles/router.nix
-    ../roles/web.nix
+    ../roles/webserver.nix
   ];
 
   networking.hostName = "apu";
@@ -19,8 +19,7 @@
 
     kernelParams = [ "console=tty0" "console=ttyS0,115200n8" ];
     initrd.availableKernelModules = [ "ahci" "ohci_pci" "ehci_pci" "usb_storage" ];
-    kernelModules = [ "kvm-amd" ];
-    extraModulePackages = [ ];
+    kernelModules = [ "kvm-amd" "tun" "virtio" ];
   };
 
   fileSystems."/" = {
@@ -31,8 +30,6 @@
 
   system.stateVersion = "16.03";
   system.autoUpgrade.enable = true;
-
-  nix.gc.automatic = true;
 
   services.haveged.enable = true;
 }

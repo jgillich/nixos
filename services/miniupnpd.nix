@@ -30,7 +30,7 @@ in
 
       internalIPs = mkOption {
         type = types.listOf types.str;
-        example = [ "192.168.1.0/24" ];
+        example = [ "192.168.1.1/24" "enp1s0" ];
         description = ''
           The IP address ranges to listen on.
         '';
@@ -89,12 +89,12 @@ in
       description = "MiniUPnP daemon";
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
-      path = [ pkgs.miniupnpd ];
       serviceConfig = {
-        ExecStart = "${pkgs.miniupnpd}/bin/miniupnpd -d -f ${configFile}";
-        #PIDFile = "/var/run/miniupnpd.pid";
-        #Type = "forking";
+        ExecStart = "${pkgs.miniupnpd}/bin/miniupnpd -f ${configFile}";
+        PIDFile = "/var/run/miniupnpd.pid";
+        Type = "forking";
       };
     };
   };
 }
+

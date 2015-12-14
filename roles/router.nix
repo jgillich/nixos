@@ -16,15 +16,14 @@ in
     firewall = {
       enable = true;
       allowPing = true;
-      trustedInterfaces = [ "wlp4s0" ];
+      trustedInterfaces = [ "wlp4s0"  ];
       allowedTCPPorts = [
         22    # ssh
         80    # http
         443   # https
         2222  # git
       ];
-      allowedUDPPorts = [
-      ];
+      allowedUDPPorts = [ ];
     };
 
     nat = {
@@ -97,10 +96,11 @@ in
   };
 
   services.dnsmasq = {
-    enable = false;
+    enable = true;
     servers = [ "8.8.8.8" "8.8.4.4" ];
     extraConfig = ''
-      no-resolv
+      interface=wlp4s0,enp2s0,enp3s0
+      bind-interfaces
     '';
   };
 
@@ -129,6 +129,7 @@ in
   services.miniupnpd = {
     enable = true;
     externalInterface = "ppp0";
-    internalIPs = [ "10.0.1.1/24" "10.0.2.1/24" "10.0.3.1/24" ];
+    natpmp = true;
+    internalIPs = [ "wlp4s0" ];
   };
 }

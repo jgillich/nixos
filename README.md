@@ -2,8 +2,8 @@ My NixOS configuration for various devices.
 
 ### Structure
 
-* machine: Physical machine, has multiple roles
-* role: Collection of services and packages
+* A **machine** has one or more roles
+* A **role** is a collection of **packages** and **services**
 
 ### Secrets
 

@@ -52,6 +52,7 @@
   services.xserver = {
     enable = true;
     layout = "us";
+    synaptics.enable = true;
     displayManager.slim.enable = true;
     desktopManager.gnome3.enable = true;
     desktopManager.xterm.enable = false;
@@ -109,5 +110,4 @@
       });
     '';
   };
-
 }
