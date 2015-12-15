@@ -1,7 +1,5 @@
 { config, lib, pkgs, ... }:
 
-# FIXME: make an assertion of interface != ""
-
 with lib;
 
 let
@@ -10,7 +8,7 @@ in
 {
   options = {
     services.ppp = {
-      enable = mkEnableOption "PPP client";
+      enable = mkEnableOption "ppp client service";
 
       config = mkOption {
         type = types.attrsOf (types.submodule (
@@ -34,28 +32,16 @@ in
 
               interface = mkOption {
                 type = types.str;
-                default = "";
                 description = "Interface which the ppp connection will use.";
               };
 
-              debug = mkOption {
-                type = types.bool;
-                default = false;
-                description = "Enable debug of connection.";
-              };
+              pppoe = mkEnableOption "pppoe plugin";
+
+              debug = mkEnableOption "debug mode";
 
               extraOptions = mkOption {
                 type = types.lines;
-                default = ''
-                  noauth
-                  defaultroute
-                  usepeerdns
-                  persist
-                  ipcp-accept-remote
-                  ipcp-accept-local
-                  lcp-echo-interval 15
-                  lcp-echo-failure 3
-                '';
+                default = "";
                 description = "Extra ppp connection options";
               };
             };
@@ -68,8 +54,18 @@ in
           {
             velox = {
               interface = "enp1s0";
+              pppoe = true;
               username = "0000000000@oi.com.br";
               password = "fulano";
+              extraOptions = \'\'
+                noauth
+                defaultroute
+                persist
+                maxfail 0
+                holdoff 5
+                lcp-echo-interval 15
+                lcp-echo-failure 3
+              \'\';
             };
           }
         '';
@@ -102,16 +98,16 @@ in
 
     environment.etc = {
       "ppp/pap-secrets".text = concatStringsSep "\n"
-        (mapAttrsToList (name: cfg: "${cfg.username} * ${cfg.password}") cfg.config);
+          (mapAttrsToList (name: cfg: "${cfg.username} * ${cfg.password}") cfg.config);
       } //
-      mapAttrs' (name: cfg: nameValuePair "ppp/peers/${name}"
-      { text = concatStringsSep "\n"
-        [ "plugin rp-pppoe.so" # FIXME: generalize for non pppoe
-          "${cfg.interface}"
-          "user \"${cfg.username}\""
-          "${cfg.extraOptions}"
-          (optionalString cfg.debug "debug")
-        ];
+      mapAttrs' (name: cfg: nameValuePair "ppp/peers/${name}" {
+        text = concatStringsSep "\n" [
+            (optionalString cfg.pppoe "plugin rp-pppoe.so")
+            "${cfg.interface}"
+            "user \"${cfg.username}\""
+            "${cfg.extraOptions}"
+            (optionalString cfg.debug "debug")
+          ];
       }) cfg.config;
   };
 }

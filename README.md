@@ -2,7 +2,7 @@ My NixOS configuration for various devices.
 
 ### Structure
 
-* A **machine** has one or more roles
+* A **machine** has one or more role
 * A **role** is a collection of **packages** and **services**
 
 ### Secrets

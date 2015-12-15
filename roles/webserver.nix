@@ -115,7 +115,7 @@ in
     nfs.server = {
       enable = true;
       exports = ''
-        /var/music  10.0.1.1(rw,sync,no_subtree_check)
+        /var/music  127.0.0.1(rw,sync,no_subtree_check)
       '';
     };
   };
@@ -243,7 +243,7 @@ in
     config = { config, pkgs, ... }: {
       environment.systemPackages = [ pkgs.nfs-utils ];
       fileSystems."/var/music" = {
-        device = "10.0.1.1:/var/music";
+        device = "127.0.0.1:/var/music";
         fsType = "nfs";
       };
       services.subsonic = {
@@ -266,6 +266,7 @@ in
       services.openssh = {
         enable = true;
         ports = [ 2222 ];
+        passwordAuthentication = false;
       };
     };
   };

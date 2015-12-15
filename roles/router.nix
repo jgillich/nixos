@@ -7,6 +7,7 @@ in
   imports =  [
     ../services/ppp.nix
     ../services/miniupnpd.nix
+    ../services/dnsmasq.nix
   ];
 
   networking = {
@@ -16,7 +17,8 @@ in
     firewall = {
       enable = true;
       allowPing = true;
-      trustedInterfaces = [ "wlp4s0"  ];
+      trustedInterfaces = [ "wlp4s0" "enp2s0" "enp3s0" ];
+      checkReversePath = false; # https://github.com/NixOS/nixpkgs/issues/10101
       allowedTCPPorts = [
         22    # ssh
         80    # http
@@ -28,13 +30,13 @@ in
 
     nat = {
       enable = true;
-      internalIPs = [ "10.0.1.0/24" "10.0.2.0/24" "10.0.3.0/24" ];
+      internalIPs = [ "192.168.1.0/24" "192.168.2.0/24" "192.168.3.0/24" ];
       externalInterface = "ppp0";
     };
 
     interfaces = {
       wlp4s0 = {
-        ipAddress = "10.0.1.1";
+        ipAddress = "192.168.1.1";
         prefixLength = 24;
       };
 
@@ -43,12 +45,12 @@ in
       };
 
       enp2s0 = {
-        ipAddress = "10.0.2.1";
+        ipAddress = "192.168.2.1";
         prefixLength = 24;
       };
 
       enp3s0 = {
-        ipAddress = "10.0.3.1";
+        ipAddress = "192.168.3.1";
         prefixLength = 24;
       };
     };
@@ -75,32 +77,37 @@ in
       max-lease-time                86400;
       default-lease-time            86400;
 
-      subnet 10.0.1.0 netmask 255.255.255.0 {
-        range                       10.0.1.10 10.0.1.254;
-        option broadcast-address    10.0.1.255;
-        option routers              10.0.1.1;
+      subnet 192.168.1.0 netmask 255.255.255.0 {
+        range                       192.168.1.10 192.168.1.254;
+        option broadcast-address    192.168.1.255;
+        option routers              192.168.1.1;
       }
 
-      subnet 10.0.2.0 netmask 255.255.255.0 {
-        range                       10.0.2.10 10.0.2.254;
-        option broadcast-address    10.0.2.255;
-        option routers              10.0.2.1;
+      subnet 192.168.2.0 netmask 255.255.255.0 {
+        range                       192.168.2.10 192.168.2.254;
+        option broadcast-address    192.168.2.255;
+        option routers              192.168.2.1;
       }
-
-      subnet 10.0.3.0 netmask 255.255.255.0 {
-        range                       10.0.3.10 10.0.3.254;
-        option broadcast-address    10.0.3.255;
-        option routers              10.0.3.1;
+      subnet 192.168.3.0 netmask 255.255.255.0 {
+        range                       192.168.3.10 192.168.3.254;
+        option broadcast-address    192.168.3.255;
+        option routers              192.168.3.1;
       }
     '';
   };
 
-  services.dnsmasq = {
-    enable = true;
+  services.dnsmasq2 = {
+    enable = false;
     servers = [ "8.8.8.8" "8.8.4.4" ];
     extraConfig = ''
-      interface=wlp4s0,enp2s0,enp3s0
+      domain=home
+      interface=wlp4s0
+      interface=enp2s0
+      interface=enp3s0
       bind-interfaces
+      dhcp-range=192.168.1.10,192.168.1.254,24h
+      dhcp-range=192.168.2.10,192.168.2.254,24h
+      dhcp-range=192.168.3.10,192.168.3.254,24h
     '';
   };
 
@@ -112,7 +119,7 @@ in
         interface = "enp1s0";
         username = secrets.easybell.username;
         password = secrets.easybell.password;
-        debug = true;
+        pppoe = true;
         extraOptions = ''
           noauth
           defaultroute
@@ -127,7 +134,7 @@ in
   };
 
   services.miniupnpd = {
-    enable = true;
+    enable = false;
     externalInterface = "ppp0";
     natpmp = true;
     internalIPs = [ "wlp4s0" ];
