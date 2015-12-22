@@ -5,26 +5,32 @@
     ../services/rkt.nix
   ];
 
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [
+      22000 # syncthing
+    ];
+    allowedUDPPorts = [
+      1900 # UPNP
+    ];
+  };
+
   environment.systemPackages = with pkgs; [
     rustc cargo
     go
     firefoxWrapper
-    gnupg
-    pass
+    gnupg pass
     stow
-    atom
+    atom neovim
     gimp inkscape
-    transmission
     pitivi
-    docker
-    heroku
-    gitg gitAndTools.hub
+    gitg gitAndTools.hub gitAndTools.gitAnnex heroku
     parted gnome3.gnome-disk-utility
     sshfsFuse
-    irssi gnome3.polari xchat
+    irssi gnome3.polari telepathy_gabble
     virtmanager #gnome3.gnome-boxes
-    python27Packages.docker_compose
- ];
+    tor torbrowser notbit
+  ];
 
   environment.variables = {
     GTK2_RC_FILES = "${pkgs.gnome_themes_standard}/share/themes/Adwaita/gtk-2.0/gtkrc";
@@ -37,6 +43,7 @@
   };
 
   virtualisation.docker.enable = true;
+  virtualisation.docker.extraOptions = "--exec-opt native.cgroupdriver=cgroupfs";
   virtualisation.docker.socketActivation = false;
   virtualisation.rkt.enable = true;
   virtualisation.libvirtd.enable = true;
@@ -44,7 +51,7 @@
   networking.networkmanager.enable = true;
 
   services.syncthing = {
-    enable = true;
+    enable = false;
     user = "jakob";
     dataDir = "/home/jakob";
   };
@@ -66,6 +73,13 @@
     proxyAddress = "127.0.0.1";
     proxyPort = 8123;
   };
+
+  services.tor = {
+    enable = true;
+    client.enable = true;
+  };
+
+  services.notbit.enable = true;
 
   services.nginx = {
     enable = true;
