@@ -63,7 +63,7 @@ in
     wpaPassphrase = secrets.hostapd.wpaPassphrase;
     hwMode = "g";
     channel = 10;
-    extraConfig = ''
+    extraCfg = ''
       ieee80211n=1
     '';
   };
