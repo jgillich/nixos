@@ -7,6 +7,7 @@
 
   networking.firewall = {
     enable = true;
+    checkReversePath = false; # https://github.com/NixOS/nixpkgs/issues/10101
     allowedTCPPorts = [
       22000 # syncthing
     ];
@@ -64,6 +65,7 @@
     desktopManager.budgie.enable = true;
     desktopManager.xterm.enable = false;
     startGnuPGAgent = true;
+    synaptics.enable = true;
   };
 
   programs.ssh.startAgent = false;

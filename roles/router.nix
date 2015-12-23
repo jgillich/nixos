@@ -60,9 +60,12 @@ in
     enable = true;
     interface = "wlp4s0";
     ssid = secrets.hostapd.ssid;
+    wpaPassphrase = secrets.hostapd.wpaPassphrase;
     hwMode = "g";
     channel = 10;
-    wpaPassphrase = secrets.hostapd.wpaPassphrase;
+    extraConfig = ''
+      ieee80211n=1
+    '';
   };
 
   services.dhcpd = {

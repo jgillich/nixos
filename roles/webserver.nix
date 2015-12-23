@@ -203,21 +203,11 @@ in
     httpsPort = 8020;
   };
 
-  #containers.gitlab = {
-  #  autoStart = true;
-  #  config = { config, pkgs, ... }: {
-  #    services.gitlab = {
-  #      enable = true;
-  #      port = 8030;
-  #      emailFrom = "gitlab@xapp.ga";
-  #      host = "git.xapp.ga";
-  #      databasePassword = secrets.gitlab.databasePassword;
-  #    };
-  #    services.openssh = {
-  #      enable = true;
-  #      ports = [ 2222 ];
-  #      passwordAuthentication = false;
-  #    };
-  #  };
-  #};
+  services.gitlab = {
+    enable = true;
+    port = 8030;
+    emailFrom = "gitlab@xapp.ga";
+    host = "git.xapp.ga";
+    databasePassword = secrets.gitlab.databasePassword;
+  };
 }
