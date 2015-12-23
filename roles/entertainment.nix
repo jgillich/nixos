@@ -13,7 +13,6 @@ in
   hardware = {
     opengl.driSupport = true;
     opengl.driSupport32Bit = true;
-    pulseaudio.enable = true;
     pulseaudio.support32Bit = true;
   };
 

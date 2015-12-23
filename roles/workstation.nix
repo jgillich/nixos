@@ -59,20 +59,14 @@
   services.xserver = {
     enable = true;
     layout = "us";
-    synaptics.enable = true;
     displayManager.slim.enable = true;
     desktopManager.gnome3.enable = true;
+    desktopManager.budgie.enable = true;
     desktopManager.xterm.enable = false;
     startGnuPGAgent = true;
   };
 
   programs.ssh.startAgent = false;
-
-  services.polipo = {
-    enable = true;
-    proxyAddress = "127.0.0.1";
-    proxyPort = 8123;
-  };
 
   services.tor = {
     enable = true;
@@ -124,4 +118,5 @@
       });
     '';
   };
+
 }
