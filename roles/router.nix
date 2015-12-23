@@ -64,7 +64,10 @@ in
     hwMode = "g";
     channel = 10;
     extraCfg = ''
+      ieee80211d=1
+      country_code=DE
       ieee80211n=1
+      wmm_enabled=1
     '';
   };
 
