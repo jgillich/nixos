@@ -83,7 +83,7 @@ in
   config = mkIf cfg.enable {
     systemd.services."ppp@" = {
       description = "PPP link to '%i'";
-      before = [ "network.target" ];
+      wantedBy = [ "network.target" ];
 
       serviceConfig = {
         ExecStart = "${pkgs.ppp}/sbin/pppd call %I nodetach nolog";

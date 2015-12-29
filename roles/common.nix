@@ -6,24 +6,20 @@ in
 {
   time.timeZone = "Europe/Berlin";
 
-  i18n = {
-    consoleFont = "Lat2-Terminus16";
-    consoleKeyMap = "us";
-    defaultLocale = "en_US.UTF-8";
-  };
-
   environment.systemPackages = with pkgs; [
     (import ../pkgs/dotfiles.nix)
     usbutils pciutils nfs-utils psmisc file gptfdisk
     git gitAndTools.git-crypt
     python ruby bundler nodejs gcc gnumake
-    vim curl wget bind dhcp unzip fish
+    curl wget bind dhcp unzip
     htop tmux picocom stow duplicity
   ];
 
   environment.variables = {
-   EDITOR = "vim";
+    EDITOR = "${pkgs.neovim}/bin/nvim";
   };
+
+  programs.fish.enable = true;
 
   nix.gc.automatic = true;
   nix.useChroot = true;
@@ -33,13 +29,13 @@ in
   boot.cleanTmpDir = true;
 
   security = {
-   sudo.enable = true;
-   sudo.wheelNeedsPassword = false;
+    sudo.enable = true;
+    sudo.wheelNeedsPassword = false;
   };
 
   services.openssh = {
-   enable = true;
-   passwordAuthentication = false;
+    enable = true;
+    passwordAuthentication = false;
   };
 
   services.ntp.enable = true;
@@ -57,6 +53,7 @@ in
     extraUsers.jakob = {
       hashedPassword = secrets.hashedPassword;
       isNormalUser = true;
+      shell = "${pkgs.fish}/bin/fish";
       uid = 1000;
       description = "Jakob Gillich";
       extraGroups = [ "wheel" "disk" "cdrom" "docker" "audio" "notbit" ];

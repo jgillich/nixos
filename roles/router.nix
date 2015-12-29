@@ -6,53 +6,49 @@ in
 {
   imports =  [
     ../services/ppp.nix
-    ../services/miniupnpd.nix
-    ../services/dnsmasq.nix
   ];
 
-  networking = {
-    domain = "home";
-    nameservers = [ "8.8.8.8" "8.8.4.4" ];
+  networking.domain = "home";
+  networking.nameservers = [ "127.0.0.1" "8.8.8.8" ];
 
-    firewall = {
-      enable = true;
-      allowPing = true;
-      trustedInterfaces = [ "wlp4s0" "enp2s0" "enp3s0" ];
-      checkReversePath = false; # https://github.com/NixOS/nixpkgs/issues/10101
-      allowedTCPPorts = [
-        22    # ssh
-        80    # http
-        443   # https
-        2222  # git
-      ];
-      allowedUDPPorts = [ ];
+  networking.firewall = {
+    enable = true;
+    allowPing = true;
+    trustedInterfaces = [ "wlp4s0" "enp2s0" "enp3s0" ];
+    checkReversePath = false; # https://github.com/NixOS/nixpkgs/issues/10101
+    allowedTCPPorts = [
+      22    # ssh
+      80    # http
+      443   # https
+      2222  # git
+    ];
+    allowedUDPPorts = [ ];
+  };
+
+  networking.nat = {
+    enable = true;
+    internalIPs = [ "192.168.1.0/24" "192.168.2.0/24" "192.168.3.0/24" ];
+    externalInterface = "ppp0";
+  };
+
+  networking.interfaces = {
+    wlp4s0 = {
+      ipAddress = "192.168.1.1";
+      prefixLength = 24;
     };
 
-    nat = {
-      enable = true;
-      internalIPs = [ "192.168.1.0/24" "192.168.2.0/24" "192.168.3.0/24" ];
-      externalInterface = "ppp0";
+    enp1s0 = {
+      useDHCP = false;
     };
 
-    interfaces = {
-      wlp4s0 = {
-        ipAddress = "192.168.1.1";
-        prefixLength = 24;
-      };
+    enp2s0 = {
+      ipAddress = "192.168.2.1";
+      prefixLength = 24;
+    };
 
-      enp1s0 = {
-        useDHCP = false;
-      };
-
-      enp2s0 = {
-        ipAddress = "192.168.2.1";
-        prefixLength = 24;
-      };
-
-      enp3s0 = {
-        ipAddress = "192.168.3.1";
-        prefixLength = 24;
-      };
+    enp3s0 = {
+      ipAddress = "192.168.3.1";
+      prefixLength = 24;
     };
   };
 
@@ -71,42 +67,11 @@ in
     '';
   };
 
-  services.dhcpd = {
+  services.dnsmasq = {
     enable = true;
-    interfaces = [ "wlp4s0" "enp2s0" "enp3s0" ];
-    extraConfig = ''
-      authoritative;
-      option subnet-mask            255.255.255.0;
-      option domain-name-servers    8.8.8.8, 8.8.4.4;
-
-      # lease time 24 hours
-      max-lease-time                86400;
-      default-lease-time            86400;
-
-      subnet 192.168.1.0 netmask 255.255.255.0 {
-        range                       192.168.1.10 192.168.1.254;
-        option broadcast-address    192.168.1.255;
-        option routers              192.168.1.1;
-      }
-
-      subnet 192.168.2.0 netmask 255.255.255.0 {
-        range                       192.168.2.10 192.168.2.254;
-        option broadcast-address    192.168.2.255;
-        option routers              192.168.2.1;
-      }
-      subnet 192.168.3.0 netmask 255.255.255.0 {
-        range                       192.168.3.10 192.168.3.254;
-        option broadcast-address    192.168.3.255;
-        option routers              192.168.3.1;
-      }
-    '';
-  };
-
-  services.dnsmasq2 = {
-    enable = false;
     servers = [ "8.8.8.8" "8.8.4.4" ];
     extraConfig = ''
-      domain=home
+      domain=lan
       interface=wlp4s0
       interface=enp2s0
       interface=enp3s0
@@ -119,23 +84,20 @@ in
 
   services.ppp = {
     enable = true;
-
-    config = {
-      easybell = {
-        interface = "enp1s0";
-        username = secrets.easybell.username;
-        password = secrets.easybell.password;
-        pppoe = true;
-        extraOptions = ''
-          noauth
-          defaultroute
-          persist
-          maxfail 0
-          holdoff 5
-          lcp-echo-interval 15
-          lcp-echo-failure 3
-        '';
-        };
+    config.easybell = {
+      interface = "enp1s0";
+      username = secrets.easybell.username;
+      password = secrets.easybell.password;
+      pppoe = true;
+      extraOptions = ''
+        noauth
+        defaultroute
+        persist
+        maxfail 0
+        holdoff 5
+        lcp-echo-interval 15
+        lcp-echo-failure 3
+      '';
     };
   };
 

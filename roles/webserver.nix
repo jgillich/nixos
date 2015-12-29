@@ -1,123 +1,65 @@
 { config, pkgs, ... }:
+
 let
   secrets = import ../secrets.nix;
 in
 {
   virtualisation.libvirtd.enable = true;
 
-  services = {
-    nginx = {
-      enable = true;
-      httpConfig = ''
-        server {
-          listen 80;
-          server_name _;
-          return 301 https://$host$request_uri;
-        }
+  services.haproxy = {
+    enable = true;
+    config = ''
+      global
+        user haproxy
+        group haproxy
+        daemon
+        maxconn 4096
+        ssl-default-bind-options no-sslv3 no-tls-tickets force-tlsv12
+        ssl-default-bind-ciphers AES128+EECDH:AES128+EDH
 
-        server {
-          listen 443 ssl;
-          ssl_certificate /root/.lego/certificates/apu.sys.gillich.me.crt;
-          ssl_certificate_key /root/.lego/certificates/apu.sys.gillich.me.key;
-          root /var/www;
-        }
+      defaults
+        log global
+        mode http
 
-        server {
-          listen 443 ssl;
-          server_name sync.xapp.ga;
-          ssl_certificate /root/.lego/certificates/xapp.ga.crt;
-          ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
+      frontend http
+        bind *:80
+        redirect scheme https code 301
 
-          location / {
-            proxy_set_header Host $host;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_pass http://127.0.0.1:8384;
-          }
-        }
+      frontend https *:443
+        bind *:443 ssl crt TODO_ACME_CERTS
+        reqadd X-Forwarded-Proto:\ https
+        option forwardfor
+        option originalto
+        use_backend apu if { ssl_fc_sni apu.xsys.ga }
+        use_backend git if { ssl_fc_sni git.xapp.ga }
+        use_backend irc if { ssl_fc_sni irc.xapp.ga }
+        use_backend music if { ssl_fc_sni music.xapp.ga }
 
-        server {
-          listen 443 ssl;
-          server_name torrent.xapp.ga;
-          ssl_certificate /root/.lego/certificates/xapp.ga.crt;
-          ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
+      backend apu
+        server apu localhost:8000
+      backend git
+        server git 127.0.0.1:8010
+      backend irc
+        server irc 127.0.0.1:8020
+      backend music
+        server music 127.0.0.1:8030
+    '';
+  };
 
-          location / {
-            proxy_set_header Host $host;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_pass http://127.0.0.1:8112;
-          }
+  services.munin-cron = {
+    enable = true;
+    hosts = ''
+      [${config.networking.hostName}]
+      address localhost
+    '';
+  };
+  services.munin-node.enable = true;
 
-        }
-
-        server {
-          listen 443 ssl;
-          server_name git.xapp.ga;
-          ssl_certificate /root/.lego/certificates/xapp.ga.crt;
-          ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
-
-          location / {
-            proxy_set_header Host $host;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_pass http://127.0.0.1:8080;
-          }
-        }
-
-        server {
-          listen 443 ssl;
-          server_name irc.xapp.ga;
-          ssl_certificate /root/.lego/certificates/xapp.ga.crt;
-          ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
-
-          location / {
-            proxy_set_header Host $host;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_pass http://127.0.0.1:8010;
-          }
-        }
-
-        server {
-          listen 443 ssl;
-          server_name music.xapp.ga;
-          ssl_certificate /root/.lego/certificates/xapp.ga.crt;
-          ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
-
-          location / {
-            proxy_set_header Host $host;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_pass https://127.0.0.1:8020;
-          }
-        }
-
-        server {
-          listen 443 ssl;
-          server_name mail.xapp.ga;
-          ssl_certificate /root/.lego/certificates/xapp.ga.crt;
-          ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
-
-          location / {
-            proxy_set_header Host $host;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_pass http://127.0.0.1:33411;
-          }
-        }
-      '';
-    };
-
-    munin-cron = {
-      enable = true;
-      hosts = ''
-        [${config.networking.hostName}]
-        address localhost
-      '';
-    };
-    munin-node.enable = true;
-
-    nfs.server = {
-      enable = true;
-      exports = ''
-        /var/music  127.0.0.1(rw,sync,no_subtree_check)
-      '';
-    };
+  nfs.server = {
+    enable = true;
+    exports = ''
+      /var/music  127.0.0.1(rw,sync,no_subtree_check)
+    '';
   };
 
   systemd.services.dyndns = {
@@ -148,66 +90,29 @@ in
     startAt = "*:0/5";
   };
 
-  services.shout = {
-    enable = true;
-    port = 8010;
-    private = true;
-    configFile = ''
-      module.exports = {
-        public: false,
-        host: "0.0.0.0",
-        port: 9000,
-        bind: undefined,
-        theme: "themes/example.css",
-        autoload: true,
-        prefetch: false,
-        prefetchMaxImageSize: 512,
-        displayNetwork: true,
-        logs: {
-          format: "YYYY-MM-DD HH:mm:ss",
-          timezone: "UTC+00:00"
-        },
-        defaults: {
-          name: "Freenode",
-          host: "irc.freenode.org",
-          port: 6697,
-          password: "",
-          tls: true,
-          nick: "shout-user",
-          username: "shout-user",
-          realname: "Shout User",
-          join: "#foo, #shout-irc"
-        },
-        transports: ["polling", "websocket"],
-        https: {
-          enable: false,
-          key: "",
-          certificate: ""
-        },
-        identd: {
-          enable: false,
-          port: 113
-        }
-      };
-    '';
-  };
-
-  services.syncthing = {
-    enable = true;
-    user = "jakob";
-    dataDir = "/home/jakob";
-  };
-
-  services.subsonic = {
-    enable = true;
-    httpsPort = 8020;
-  };
-
   services.gitlab = {
     enable = true;
-    port = 8030;
+    port = 8010;
     emailFrom = "gitlab@xapp.ga";
     host = "git.xapp.ga";
     databasePassword = secrets.gitlab.databasePassword;
   };
+
+  services.shout = {
+    enable = true;
+    port = 8020;
+    private = true;
+  };
+
+  services.subsonic = {
+    enable = true;
+    httpsPort = 8030;
+  };
+
+  services.syncthing = {
+    enable = false;
+    user = "jakob";
+    dataDir = "/home/jakob";
+  };
+
 }
