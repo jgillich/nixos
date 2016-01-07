@@ -30,5 +30,5 @@
   system.stateVersion = "16.03";
   system.autoUpgrade.enable = true;
 
-  nix.maxJobs = 4;
+  nix.maxJobs = 2;
 }

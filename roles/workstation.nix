@@ -17,7 +17,7 @@
     parted gnome3.gnome-disk-utility
     sshfsFuse stow
     virtmanager
-    tor tor-browser notbit
+    tor torbrowser pybitmessage
   ];
 
   environment.variables = {
@@ -54,8 +54,6 @@
     enable = true;
     client.enable = true;
   };
-
-  services.notbit.enable = true;
 
   security.polkit = {
     enable = true;

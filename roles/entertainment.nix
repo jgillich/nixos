@@ -8,6 +8,8 @@ in
   environment.systemPackages = with pkgs; [
     steam
     google-chrome
+    zeroad openra
+    wine
   ];
 
   hardware = {
