@@ -27,6 +27,11 @@
     fsType = "vfat";
   };
 
+  zramSwap = {
+    enable = true;
+    numDevices = 4;
+  };
+
   system.stateVersion = "16.03";
   system.autoUpgrade.enable = true;
 

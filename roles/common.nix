@@ -28,10 +28,6 @@ in
 
   boot.cleanTmpDir = true;
 
-  boot.kernel.sysctl = {
-    "vm.swappiness" = 10;
-  };
-
   security = {
     sudo.enable = true;
     sudo.wheelNeedsPassword = false;
