@@ -47,9 +47,9 @@ in
 
       server {
         listen 443 ssl;
-        server_name git.xapp.ga;
-        ssl_certificate /root/.lego/certificates/xapp.ga.crt;
-        ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
+        server_name git.gillich.me;
+        ssl_certificate /var/lib/acme/gillich.me/fullchain.pem;
+        ssl_certificate_key /var/lib/acme/gillich.me/key.pem;
 
         location / {
           proxy_set_header Host $host;
@@ -60,27 +60,14 @@ in
 
       server {
         listen 443 ssl;
-        server_name irc.xapp.ga;
-        ssl_certificate /root/.lego/certificates/xapp.ga.crt;
-        ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
+        server_name irc.gillich.me;
+        ssl_certificate /var/lib/acme/gillich.me/fullchain.pem;
+        ssl_certificate_key /var/lib/acme/gillich.me/key.pem;
 
         location / {
           proxy_set_header Host $host;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_pass http://127.0.0.1:${toString ports.shout};
-        }
-      }
-
-      server {
-        listen 443 ssl;
-        server_name music.xapp.ga;
-        ssl_certificate /root/.lego/certificates/xapp.ga.crt;
-        ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
-
-        location / {
-          proxy_set_header Host $host;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_pass https://127.0.0.1:${toString ports.subsonic};
         }
       }
     '';
