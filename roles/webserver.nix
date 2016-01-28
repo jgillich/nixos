@@ -83,6 +83,7 @@ in
       "sync.gillich.me" = null;
       "jakob.gillich.me" = null;
       "apu.gillich.me" = null;
+      "irc.gillich.me" = null;
     };
   };
 
