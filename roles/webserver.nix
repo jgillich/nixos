@@ -41,7 +41,7 @@ in
         location / {
           proxy_set_header Host $host;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_pass http://127.0.0.1:${toString ports.subsonic};
+          proxy_pass https://127.0.0.1:${toString ports.subsonic};
         }
       }
 
@@ -139,7 +139,7 @@ in
 
   services.subsonic = {
     enable = true;
-    port = ports.subsonic;
+    httpsPort = ports.subsonic;
   };
 
 }
