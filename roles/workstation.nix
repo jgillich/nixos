@@ -17,7 +17,7 @@
     atom
     gimp inkscape
     pitivi
-    gitg gitAndTools.hub gitAndTools.gitAnnex heroku
+    gitg gitAndTools.gitAnnex heroku
     parted gnome3.gnome-disk-utility
     sshfsFuse stow
     virtmanager

@@ -9,7 +9,7 @@ in
   environment.systemPackages = with pkgs; [
     (import ../pkgs/dotfiles.nix)
     usbutils pciutils nfs-utils psmisc file gptfdisk
-    git gitAndTools.git-crypt
+    git gitAndTools.git-crypt gitAndTools.hub
     python ruby bundler nodejs gcc gnumake
     curl wget bind dhcp unzip
     htop tmux picocom stow duplicity
