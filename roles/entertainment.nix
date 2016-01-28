@@ -7,13 +7,14 @@ in
 
   environment.systemPackages = with pkgs; [
     steam
-    google-chrome chromium
+    google-chrome #chromium
     zeroad openra
     clementine
     wine
   ];
 
-  nixpkgs.config.chromium.enableWideVine = true; # drm
+  # doesn't work on amazon video
+  # nixpkgs.config.chromium.enableWideVine = true; # drm
 
   hardware = {
     opengl.driSupport = true;

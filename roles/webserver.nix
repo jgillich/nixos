@@ -2,48 +2,101 @@
 
 let
   secrets = import ../secrets.nix;
+  ports = {
+    subsonic = 8001;
+    shout = 8003;
+    gitlab = 8004;
+  };
 in
 {
   virtualisation.libvirtd.enable = true;
 
-  services.haproxy = {
+  nginx = {
     enable = true;
-    config = ''
-      global
-        user haproxy
-        group haproxy
-        daemon
-        maxconn 4096
-        ssl-default-bind-options no-sslv3 no-tls-tickets force-tlsv12
-        ssl-default-bind-ciphers AES128+EECDH:AES128+EDH
+    httpConfig = ''
+      server {
+        listen 80;
+        server_name _;
+        location /.well-known/acme-challenge {
+          root /var/www/challenges;
+        }
+        location / {
+          return 301 https://$host$request_uri;
+        }
+      }
 
-      defaults
-        log global
-        mode http
+      server {
+        listen 443 ssl;
+        ssl_certificate /var/lib/acme/gillich.me/fullchain.pem;
+        ssl_certificate_key /var/lib/acme/gillich.me/key.pem;
+        root /var/www;
+      }
 
-      frontend http
-        bind *:80
-        redirect scheme https code 301
+      server {
+        listen 443 ssl;
+        server_name music.gillich.me;
+        ssl_certificate /var/lib/acme/gillich.me/fullchain.pem;
+        ssl_certificate_key /var/lib/acme/gillich.me/key.pem;
 
-      frontend https *:443
-        bind *:443 ssl crt TODO_ACME_CERTS
-        reqadd X-Forwarded-Proto:\ https
-        option forwardfor
-        option originalto
-        use_backend apu if { ssl_fc_sni apu.xsys.ga }
-        use_backend git if { ssl_fc_sni git.xapp.ga }
-        use_backend irc if { ssl_fc_sni irc.xapp.ga }
-        use_backend music if { ssl_fc_sni music.xapp.ga }
+        location / {
+          proxy_set_header Host $host;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_pass http://127.0.0.1:${ports.subsonic};
+        }
+      }
 
-      backend apu
-        server apu localhost:8000
-      backend git
-        server git 127.0.0.1:8010
-      backend irc
-        server irc 127.0.0.1:8020
-      backend music
-        server music 127.0.0.1:8030
+      server {
+        listen 443 ssl;
+        server_name git.xapp.ga;
+        ssl_certificate /root/.lego/certificates/xapp.ga.crt;
+        ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
+
+        location / {
+          proxy_set_header Host $host;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_pass http://127.0.0.1:${ports.gitlab};
+        }
+      }
+
+      server {
+        listen 443 ssl;
+        server_name irc.xapp.ga;
+        ssl_certificate /root/.lego/certificates/xapp.ga.crt;
+        ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
+
+        location / {
+          proxy_set_header Host $host;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_pass http://127.0.0.1:${ports.shout};
+        }
+      }
+
+      server {
+        listen 443 ssl;
+        server_name music.xapp.ga;
+        ssl_certificate /root/.lego/certificates/xapp.ga.crt;
+        ssl_certificate_key /root/.lego/certificates/xapp.ga.key;
+
+        location / {
+          proxy_set_header Host $host;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_pass https://127.0.0.1:${ports.subsonic};
+        }
+      }
     '';
+  };
+
+  security.acme.certs."gillich.me" = {
+    webroot = "/var/www/challenges";
+    email = "jakob@gillich.me";
+    extraDomains = {
+      "www.gillich.me" = null;
+      "music.gillich.me" = null;
+      "git.gillich.me" = null;
+      "sync.gillich.me" = null;
+      "jakob.gillich.me" = null;
+      "apu.gillich.me" = null;
+    };
   };
 
   services.munin-cron = {
@@ -54,13 +107,6 @@ in
     '';
   };
   services.munin-node.enable = true;
-
-  nfs.server = {
-    enable = true;
-    exports = ''
-      /var/music  127.0.0.1(rw,sync,no_subtree_check)
-    '';
-  };
 
   systemd.services.dyndns = {
     description = "Dynamic DNS";
@@ -92,7 +138,7 @@ in
 
   services.gitlab = {
     enable = true;
-    port = 8010;
+    port = ports.gitlab;
     emailFrom = "gitlab@xapp.ga";
     host = "git.xapp.ga";
     databasePassword = secrets.gitlab.databasePassword;
@@ -100,19 +146,13 @@ in
 
   services.shout = {
     enable = true;
-    port = 8020;
+    port = ports.shout;
     private = true;
   };
 
   services.subsonic = {
     enable = true;
-    httpsPort = 8030;
-  };
-
-  services.syncthing = {
-    enable = false;
-    user = "jakob";
-    dataDir = "/home/jakob";
+    httpsPort = ports.subsonic;
   };
 
 }

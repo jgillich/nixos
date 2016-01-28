@@ -28,11 +28,6 @@
     options = "defaults,compress=lzo,noatime";
   };
 
-  zramSwap = {
-    enable = true;
-    numDevices = 2;
-  };
-
   system.stateVersion = "16.03";
   system.autoUpgrade.enable = true;
 

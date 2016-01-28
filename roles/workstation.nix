@@ -11,7 +11,7 @@
   };
 
   environment.systemPackages = with pkgs; [
-    (wrapFirefox { browser = firefox.override { enableOfficialBranding = true; }; })
+    firefox
     rustc cargo go
     gnupg pass
     atom
@@ -23,6 +23,8 @@
     virtmanager
     tor torbrowser pybitmessage
   ];
+
+  nixpkgs.config.firefox.enableOfficialBranding = true;
 
   environment.variables = {
     GTK2_RC_FILES = "${pkgs.gnome_themes_standard}/share/themes/Adwaita/gtk-2.0/gtkrc";
