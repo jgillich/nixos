@@ -139,7 +139,7 @@ in
 
   services.subsonic = {
     enable = true;
-    httpsPort = ports.subsonic;
+    port = ports.subsonic;
   };
 
 }

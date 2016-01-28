@@ -13,6 +13,7 @@ in
     python ruby bundler nodejs gcc gnumake
     curl wget bind dhcp unzip
     htop tmux picocom stow duplicity
+    neovim
   ];
 
   environment.variables = {
