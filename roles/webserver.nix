@@ -11,7 +11,7 @@ in
 {
   virtualisation.libvirtd.enable = true;
 
-  nginx = {
+  services.nginx = {
     enable = true;
     httpConfig = ''
       server {
