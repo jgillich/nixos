@@ -56,6 +56,26 @@
     enable = true;
   };
 
+  environment.etc."synergy-server.conf".text = ''
+    section: screens
+    thinkpad:
+    encore:
+    end
+    section: aliases
+      thinkpad:
+        192.168.1.10
+      encore:
+        192.168.1.92
+    end
+    section: links
+      thinkpad:
+          down = encore
+      encore:
+          up = thinkpad
+    end
+  '';
+
+
   programs.ssh.startAgent = false;
 
   services.tor = {
