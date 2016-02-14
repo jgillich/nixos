@@ -58,8 +58,8 @@
 
   environment.etc."synergy-server.conf".text = ''
     section: screens
-    thinkpad:
-    encore:
+      thinkpad:
+      encore:
     end
     section: aliases
       thinkpad:
