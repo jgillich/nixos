@@ -25,7 +25,7 @@
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/76cce545-e684-45e8-bc13-04dea5dc63dc";
     fsType = "btrfs";
-    options = "defaults,compress=lzo,noatime";
+    options = [ "defaults" "compress=lzo" "noatime" ];
   };
 
   system.stateVersion = "16.03";

@@ -19,16 +19,13 @@
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/e41cf85e-45ee-4bcf-bf30-1d2432875b0d";
     fsType = "btrfs";
-    options = "defaults,compress=lzo,noatime";
+    options = [ "defaults" "compress=lzo" "noatime" ];
   };
 
   fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/0F93-D786";
     fsType = "vfat";
   };
-
-  system.stateVersion = "16.03";
-  system.autoUpgrade.enable = true;
 
   nix.maxJobs = 2;
 }

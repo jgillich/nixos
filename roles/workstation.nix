@@ -13,18 +13,17 @@
   environment.systemPackages = with pkgs; [
     firefox
     rustc cargo go
+    #elmPackages.elm
     gnupg pass
-    atom
+    atom lighttable
     gimp inkscape
     pitivi
     gitg gitAndTools.gitAnnex heroku
     parted gnome3.gnome-disk-utility
     sshfsFuse stow
-    virtmanager
+    #virtmanager
     tor torbrowser pybitmessage
   ];
-
-  nixpkgs.config.firefox.enableOfficialBranding = true;
 
   environment.variables = {
     GTK2_RC_FILES = "${pkgs.gnome_themes_standard}/share/themes/Adwaita/gtk-2.0/gtkrc";
@@ -34,7 +33,7 @@
   virtualisation.docker.extraOptions = "--exec-opt native.cgroupdriver=cgroupfs";
   virtualisation.docker.socketActivation = false;
   virtualisation.rkt.enable = true;
-  virtualisation.libvirtd.enable = true;
+  #virtualisation.libvirtd.enable = true;
 
   services.syncthing = {
     enable = false;
@@ -52,35 +51,26 @@
     synaptics.enable = true;
   };
 
-  services.synergy.server = {
-    enable = true;
-  };
-
-  environment.etc."synergy-server.conf".text = ''
-    section: screens
-      thinkpad:
-      encore:
-    end
-    section: aliases
-      thinkpad:
-        192.168.1.10
-      encore:
-        192.168.1.92
-    end
-    section: links
-      thinkpad:
-          down = encore
-      encore:
-          up = thinkpad
-    end
-  '';
-
-
   programs.ssh.startAgent = false;
 
   services.tor = {
     enable = true;
     client.enable = true;
+  };
+
+  services.tarsnap = {
+    enable = true;
+
+    archives.machine.directories = [
+      "/etc/nixos"
+    ];
+
+    archives.jgillich.directories = [
+      "/home/jakob/.dotfiles"
+      "/home/jakob/.password-store"
+      "/home/jakob/.gnupg2"
+      "/home/jakob/.ssh"
+    ];
   };
 
   security.polkit = {
