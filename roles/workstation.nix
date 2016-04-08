@@ -12,8 +12,7 @@
 
   environment.systemPackages = with pkgs; [
     firefox
-    rustc cargo go
-    #elmPackages.elm
+    rustc rustfmt cargo racerRust
     gnupg pass
     atom lighttable
     gimp inkscape
@@ -21,22 +20,25 @@
     gitg gitAndTools.gitAnnex heroku
     parted gnome3.gnome-disk-utility
     sshfsFuse stow
-    #virtmanager
+    gnome3.gnome-boxes
     tor torbrowser pybitmessage
+    androidsdk idea.android-studio
   ];
 
   environment.variables = {
     GTK2_RC_FILES = "${pkgs.gnome_themes_standard}/share/themes/Adwaita/gtk-2.0/gtkrc";
   };
 
-  virtualisation.docker.enable = true;
-  virtualisation.docker.extraOptions = "--exec-opt native.cgroupdriver=cgroupfs";
-  virtualisation.docker.socketActivation = false;
-  virtualisation.rkt.enable = true;
+  virtualisation.docker = {
+    enable = true;
+    extraOptions = "--exec-opt native.cgroupdriver=cgroupfs";
+    socketActivation = false;
+  };
+  #virtualisation.rkt.enable = true;
   #virtualisation.libvirtd.enable = true;
 
   services.syncthing = {
-    enable = false;
+    #enable = true;
     user = "jakob";
     dataDir = "/home/jakob";
   };
@@ -47,19 +49,24 @@
     desktopManager.gnome3.enable = true;
     #desktopManager.budgie.enable = true;
     desktopManager.xterm.enable = false;
-    startGnuPGAgent = true;
     synaptics.enable = true;
   };
 
-  programs.ssh.startAgent = false;
-
-  services.tor = {
+  services.couchdb = {
     enable = true;
-    client.enable = true;
+    extraConfig = ''
+      [httpd]
+      enable_cors = true
+      [cors]
+      origins = *
+      credentials = true
+      methods = GET,PUT,POST,HEAD,DELETE
+      headers = accept, authorization, content-type, origin
+    '';
   };
 
   services.tarsnap = {
-    enable = true;
+    #enable = true;
 
     archives.machine.directories = [
       "/etc/nixos"
